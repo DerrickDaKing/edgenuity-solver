@@ -62,8 +62,10 @@ else:
 browser.get("https://auth.edgenuity.com/Login/Login/Student")        
 
 def searchGoogle(query):
-    for j in search(query, tld="co.in", num=1, stop=1, pause=1): 
-        return j
+    for j in search(query, tld="co.in", num=10, stop=10, pause=1): 
+        if j.find('quizlet') != -1:
+            return j
+    return 'Not found'
 
 def findAnswer(question):
     clear()
@@ -81,15 +83,21 @@ def findAnswer(question):
 
     # Search google for quizlet url
     quizletUrl = searchGoogle(question)
+    if quizletUrl == 'Not found':
+        print('Could not find quizlet url')
+        return
     print('Googled!')
     # print(quizletUrl)
 
     # Download and parse quizlet data
     quizletDriver.get(quizletUrl)
     print('Loaded quizlet!')
-    answerElement = quizletDriver.find_element_by_xpath("//span[contains(text(),'" + question + "')]/../../../..//a[@class='SetPageTerm-definitionText']/span")
-    print('Parsed!')
-    answer = answerElement.text
+    try:
+        answerElement = quizletDriver.find_element_by_xpath("//span[contains(text(),'" + question + "')]/../../../..//a[@class='SetPageTerm-definitionText']/span")
+        print('Parsed!')
+        answer = answerElement.text
+    except:
+        answer = 'Failed to parse!'
     clear()
     print(answer)
 
