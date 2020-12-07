@@ -1,28 +1,69 @@
 import os
 import time
-import parse
+import errno
+import psutil
+import atexit
+import platform
+import subprocess
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from googlesearch import search
 
-def searchGoogle(query):
-    for j in search(query, tld="co.in", num=1, stop=1, pause=2): 
-        return j
+found = False
+# Assign correct os commands
+if platform.system() == 'Windows':
+    clear = lambda: os.system('cls') # For Windows
+elif platform.system() == 'Linux':
+    clear = lambda: os.system('clear') # For linux
 
-clear = lambda: os.system('clear') # For linux
-# clear = lambda: os.system('cls') # For windows
-
-
-driver_path = '/usr/bin/geckodriver'
-brave_path = '/usr/bin/firefox'
-
-quizletOptions = Options()
-quizletOptions.headless = True
-
-browser = webdriver.Firefox(executable_path=driver_path)
-quizletDriver = webdriver.Firefox(options=quizletOptions, executable_path=driver_path)
+if os.path.isfile('geckodriver.exe') or os.path.isfile('geckodriver'):
+    driver_path = 'geckodriver'
+    found = True
+    # Initialize browsers
+    quizletOptions = Options()
+    quizletOptions.headless = True
+    browser = webdriver.Firefox(executable_path=driver_path)
+    quizletDriver = webdriver.Firefox(options=quizletOptions, executable_path=driver_path)
+elif os.path.isfile('chromedriver.exe') or os.path.isfile('chromedriver'):
+    driver_path = 'chromedriver'
+    found = True
+    # Initialize browsers
+    quizletOptions = Options()
+    quizletOptions.headless = True
+    browser = webdriver.Chrome(executable_path=driver_path)
+    quizletDriver = webdriver.Chrome(options=quizletOptions, executable_path=driver_path)
+elif found == False:
+    try:      
+        p = subprocess.Popen("geckodriver", stdout=subprocess.PIPE, shell=True)
+        quizletOptions = Options()
+        quizletOptions.headless = True
+        browser = webdriver.Firefox()
+        quizletDriver = webdriver.Firefox(options=quizletOptions)
+        p.kill()
+    except FileNotFoundError as e:
+        if e.errno == errno.ENOENT:
+            pass
+        else:
+            pass
+else:
+    try:      
+        p = subprocess.Popen("chromedriver", stdout=subprocess.PIPE, shell=True)
+        p.kill()
+        quizletOptions = Options()
+        quizletOptions.headless = True
+        browser = webdriver.Chrome()
+        quizletDriver = webdriver.Chrome(options=quizletOptions)
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            print('Webdriver not found!')
+        else:
+            print('Webdriver not found!')
 
 browser.get("https://auth.edgenuity.com/Login/Login/Student")        
+
+def searchGoogle(query):
+    for j in search(query, tld="co.in", num=1, stop=1, pause=1): 
+        return j
 
 def findAnswer(question):
     clear()
@@ -30,6 +71,7 @@ def findAnswer(question):
     print('Scanned!')
     question = question.strip('\n')
     question = question.strip('\t')
+    # Keep only first line if detects multiple choice question
     if question.find('A.') != -1:
         question = question.partition('\n')[0]
     question = question[:-3]
@@ -75,7 +117,13 @@ def scan():
             browser.switch_to.default_content()
         else:
             ready = True
-            time.sleep(1)       
+            time.sleep(.5)       
+
+def exit_handler():
+    print ('Exiting!')
+    browser.quit()
+    quizletDriver.quit()
+atexit.register(exit_handler)
 
 while True:
     print('?')
