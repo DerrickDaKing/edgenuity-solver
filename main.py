@@ -73,21 +73,19 @@ def findAnswer(question):
     print('Scanned!')
     question = question.strip('\n')
     question = question.strip('\t')
-    # Keep only first line if detects multiple choice question
-    if question.find('A.') != -1:
+    # Keep only first line unless multiple choice question (helps with search results)
+    if question.find('A.') == -1:
         question = question.partition('\n')[0]
     question = question[:-3]
-    # print('Question?')
-    # question = input()
-    # print(question)
 
     # Search google for quizlet url
     quizletUrl = searchGoogle(question)
     if quizletUrl == 'Not found':
         print('Could not find quizlet url')
         return
+    # Keep only first line for every question type (helps with parsing)
+    question = question.partition('\n')[0]
     print('Googled!')
-    # print(quizletUrl)
 
     # Download and parse quizlet data
     quizletDriver.get(quizletUrl)
@@ -100,9 +98,9 @@ def findAnswer(question):
         answer = 'Failed to parse!'
     clear()
     print(answer)
-
-    # Prepare for next question
-    # quizletDriver.quit()
+    # print('DEBUG INFO:')
+    # print('question: ' + question)
+    # print('quizletUrl: ' + quizletUrl)
 
 def scan():
     ready = True
@@ -110,7 +108,10 @@ def scan():
     while True:
         if ready:
             # Parse out question text
-            iframe = browser.find_element_by_id('stageFrame')
+            try:
+                iframe = browser.find_element_by_id('stageFrame')
+            except:
+                continue
             browser.switch_to_frame(iframe)
             questions = browser.find_elements_by_class_name('Practice_Question_Body')
             for i in range(len(questions)):
@@ -134,7 +135,9 @@ def exit_handler():
 atexit.register(exit_handler)
 
 while True:
-    print('?')
-    x = input()
-    if x == 'run':
-        scan()
+    # print('?')
+    # x = input()
+    # if x == 'run':
+    #     scan()
+    clear()
+    scan()
