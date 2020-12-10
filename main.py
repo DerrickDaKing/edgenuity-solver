@@ -91,6 +91,8 @@ def findAnswer(question):
     quizletDriver.get(quizletUrl)
     print('Loaded quizlet!')
     try:
+        # Scroll to bottom of page (helps prevent missing elements)
+        quizletDriver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         answerElement = quizletDriver.find_element_by_xpath("//span[contains(text(),'" + question + "')]/../../../..//a[@class='SetPageTerm-definitionText']/span")
         print('Parsed!')
         answer = answerElement.text
