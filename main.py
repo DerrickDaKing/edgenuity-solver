@@ -94,6 +94,10 @@ def findAnswer(question):
         answerElement = quizletDriver.find_element_by_xpath("//span[contains(text(),'" + question + "')]/../../../..//a[@class='SetPageTerm-definitionText']/span")
         print('Parsed!')
         answer = answerElement.text
+        # If answer and question are flipped
+        if answer.find(question) != -1:
+            answerElement = quizletDriver.find_element_by_xpath("//span[contains(text(),'" + question + "')]/../../../..//a[@class='SetPageTerm-wordText']/span")
+            answer = answerElement.text
     except:
         answer = 'Failed to parse!'
     clear()
