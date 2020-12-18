@@ -1,5 +1,5 @@
 # edgenuity-solver
-automates the process of googling answers for edgenuity tests
+automates the process of googling answers for edgenuity assignments
 
 ## Installation
 1. Run `pip install -r requirements.txt`
