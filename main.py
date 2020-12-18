@@ -109,7 +109,7 @@ def findAnswer(question):
     # print('quizletUrl: ' + quizletUrl)
 
 def scan():
-    clear()
+    # clear()
     print('Scanning...')
     ready = True
     lastQuestion = ''
