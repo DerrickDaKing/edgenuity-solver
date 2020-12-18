@@ -109,6 +109,8 @@ def findAnswer(question):
     # print('quizletUrl: ' + quizletUrl)
 
 def scan():
+    clear()
+    print('Scanning...')
     ready = True
     lastQuestion = ''
     while True:
@@ -145,5 +147,5 @@ while True:
     # x = input()
     # if x == 'run':
     #     scan()
-    clear()
+    # clear()
     scan()
